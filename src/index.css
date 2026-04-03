@@ -362,6 +362,7 @@ a {
   flex: 1;
   padding: 32px;
   max-width: 1400px;
+  min-width: 0;
   transition: var(--transition-slow);
   animation: fadeIn 0.3s ease;
 }
@@ -1369,6 +1370,9 @@ a {
   border-radius: var(--radius-lg);
   padding: 28px;
   transition: var(--transition);
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .settings-card:hover {
@@ -1444,6 +1448,8 @@ a {
 .table-wrapper {
   overflow-x: auto;
   margin-bottom: 12px;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .format-table {
@@ -2221,35 +2227,42 @@ a {
   }
 
   .transaction-list {
-    gap: 8px;
+    gap: 12px;
   }
 
   .transaction-item {
-    padding: 14px 12px;
-    gap: 10px;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    padding: 18px 16px;
+    column-gap: 14px;
+    row-gap: 10px;
+    align-items: start;
+    border-radius: var(--radius-lg);
   }
 
   .tx-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 0.9rem;
+    grid-column: 1;
+    grid-row: 1;
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
     flex-shrink: 0;
   }
 
   .tx-info {
+    grid-column: 2;
+    grid-row: 1;
     min-width: 0;
-    flex: 1;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .tx-title {
-    font-size: 0.9rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    margin-bottom: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: normal;
+    overflow: visible;
   }
 
   .tx-meta {
@@ -2261,25 +2274,43 @@ a {
   .tx-category-badge,
   .tx-account-badge {
     font-size: 0.7rem;
-    padding: 2px 6px;
+    padding: 4px 8px;
+    border-radius: 12px;
+  }
+  
+  .tx-notes {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
   }
 
   .tx-amount {
-    font-size: 0.95rem;
-    font-weight: 600;
-    white-space: nowrap;
-    flex-shrink: 0;
+    grid-column: 2;
+    grid-row: 2;
+    font-size: 1.3rem;
+    font-weight: 700;
+    justify-self: start;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .tx-actions {
-    opacity: 1; /* Always show buttons on mobile */
-    gap: 4px;
-    flex-shrink: 0;
-  }
-
-  .tx-notes {
-    font-size: 0.75rem;
+    grid-column: 1 / -1;
+    grid-row: 3;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+    padding-top: 16px;
     margin-top: 6px;
+    opacity: 1;
+  }
+  
+  .tx-actions .icon-btn {
+    padding: 8px 12px;
+    background: var(--bg-surface);
+    border-radius: var(--radius-sm);
   }
 
   /* === Buttons (touch-friendly) === */
