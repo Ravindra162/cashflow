@@ -2201,25 +2201,33 @@ a {
   /* === Transactions === */
   .filter-bar {
     flex-direction: column;
-    gap: 8px;
+    align-items: stretch; /* Make it fill space */
+    gap: 12px;
+  }
+  
+  .search-box {
+    max-width: 100%; /* Overwrite 400px desktop */
   }
 
   .filter-panel {
     flex-direction: column;
-    gap: 8px;
+    align-items: stretch;
+    gap: 12px;
   }
 
   .filter-group {
-    min-width: auto;
+    min-width: 100%;
+    width: 100%;
   }
 
   .transaction-list {
-    gap: 6px;
+    gap: 8px;
   }
 
   .transaction-item {
-    padding: 12px;
+    padding: 14px 12px;
     gap: 10px;
+    align-items: center;
   }
 
   .tx-icon {
@@ -2232,45 +2240,52 @@ a {
   .tx-info {
     min-width: 0;
     flex: 1;
+    overflow: hidden;
   }
 
   .tx-title {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     display: block;
+    margin-bottom: 4px;
   }
 
   .tx-meta {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     flex-wrap: wrap;
+    gap: 6px;
   }
 
   .tx-category-badge,
   .tx-account-badge {
-    font-size: 0.65rem;
-    padding: 1px 6px;
+    font-size: 0.7rem;
+    padding: 2px 6px;
   }
 
   .tx-amount {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
+    font-weight: 600;
     white-space: nowrap;
     flex-shrink: 0;
   }
 
   .tx-actions {
-    opacity: 1;
+    opacity: 1; /* Always show buttons on mobile */
+    gap: 4px;
+    flex-shrink: 0;
   }
 
   .tx-notes {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
+    margin-top: 6px;
   }
 
   /* === Buttons (touch-friendly) === */
   .btn {
-    padding: 10px 16px;
-    font-size: 0.85rem;
+    padding: 12px 18px; /* Larger tap targets */
+    font-size: 0.9rem;
   }
 
   .btn-primary {
@@ -2278,8 +2293,12 @@ a {
     justify-content: center;
   }
 
+  .page-header {
+    width: 100%;
+  }
+
   .page-header .btn-primary {
-    width: auto;
+    width: 100%; /* Fill header width on mobile */
   }
 
   /* === Modals (full-screen on mobile) === */
@@ -2415,7 +2434,7 @@ a {
   /* === Settings === */
   .settings-grid {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 16px;
   }
 
   .settings-grid.three-col {
@@ -2423,19 +2442,45 @@ a {
   }
 
   .settings-card {
-    padding: 20px;
+    padding: 16px;
+    width: 100%;
+    margin-bottom: 2px;
   }
 
   .settings-card-icon {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .pref-selectors {
+    gap: 16px;
+  }
+
+  .pref-options {
+    gap: 8px;
+    justify-content: flex-start;
+  }
+
+  .pref-btn {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    flex: 1; /* Stretch properly on mobile */
+    min-width: calc(50% - 8px); /* Take half minus gap */
+    text-align: center;
+    justify-content: center;
   }
 
   .reset-input-row {
     flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
   }
 
   .reset-input-row input {
+    width: 100%;
+  }
+
+  .reset-input-row .btn {
     width: 100%;
   }
 
