@@ -2,6 +2,7 @@
 
 /* ===== CSS Variables & Design Tokens ===== */
 :root {
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --bg-primary: #0a0a1a;
   --bg-secondary: #0f0f23;
   --bg-surface: rgba(255, 255, 255, 0.04);
@@ -40,6 +41,34 @@
   --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ===== Font Preferences ===== */
+[data-font="inter"] { --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+[data-font="outfit"] { --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+[data-font="playfair"] { --font-family: 'Playfair Display', serif; }
+[data-font="fira"] { --font-family: 'Fira Code', monospace; }
+
+/* ===== Theme Preferences ===== */
+[data-theme="midnight"] {
+  --bg-primary: #000000;
+  --bg-secondary: #09090b;
+  --bg-surface: rgba(255, 255, 255, 0.03);
+  --bg-surface-hover: rgba(255, 255, 255, 0.06);
+  --border-color: rgba(255, 255, 255, 0.05);
+  --primary: #3b82f6;
+  --primary-light: #60a5fa;
+  --primary-gradient: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+[data-theme="ocean"] {
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --bg-surface: rgba(255, 255, 255, 0.03);
+  --border-color: rgba(255, 255, 255, 0.06);
+  --primary: #0D9488;
+  --primary-light: #14B8A6;
+  --primary-gradient: linear-gradient(135deg, #0f766e, #14B8A6);
+}
+
 /* ===== Reset & Base ===== */
 *,
 *::before,
@@ -56,7 +85,7 @@ html {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-family);
   background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
@@ -1441,6 +1470,82 @@ a {
 .format-table tr:last-child td {
   border-bottom: none;
 }
+
+/* ===== Preferences UI ===== */
+.pref-selectors {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 16px;
+}
+
+.pref-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pref-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pref-label svg {
+  color: var(--primary-light);
+}
+
+.pref-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pref-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 10px 16px; /* Touch friendly */
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.pref-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.pref-btn.active {
+  background: rgba(108, 92, 231, 0.15);
+  border-color: var(--primary);
+  color: var(--primary-light);
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+
+.theme-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-dot.default { background: #6c5ce7; }
+.theme-dot.midnight { background: #2563eb; }
+.theme-dot.ocean { background: #0d9488; }
+
+.font-inter { font-family: 'Inter', sans-serif; }
+.font-outfit { font-family: 'Outfit', sans-serif; }
+.font-playfair { font-family: 'Playfair Display', serif; }
+.font-fira { font-family: 'Fira Code', monospace; }
 
 .format-note {
   font-size: 0.8rem !important;

@@ -11,11 +11,13 @@ import {
     Loader2,
     Coins,
     Trash2,
-    AlertTriangle
+    AlertTriangle,
+    Palette,
+    Type
 } from 'lucide-react';
 
 export default function Settings() {
-    const { categories } = useApp();
+    const { categories, preferences, updatePreferences } = useApp();
     const fileInputRef = useRef(null);
     const cashewInputRef = useRef(null);
     const [importResult, setImportResult] = useState(null);
@@ -300,11 +302,68 @@ export default function Settings() {
             <div className="page-header">
                 <div>
                     <h1>Settings</h1>
-                    <p className="subtitle">Import & export your data</p>
+                    <p className="subtitle">Manage preferences, data, and your account</p>
                 </div>
             </div>
 
             <div className="settings-grid three-col">
+                {/* Display Preferences */}
+                <div className="settings-card preferences-card" style={{ gridColumn: '1 / -1' }}>
+                    <div className="settings-card-icon pref-icon">
+                        <Palette size={28} />
+                    </div>
+                    <h3>Display Preferences</h3>
+                    <p>Customize the appearance of your application.</p>
+                    
+                    <div className="pref-selectors">
+                        <div className="pref-group">
+                            <label className="pref-label"><Palette size={16} /> Theme</label>
+                            <div className="pref-options">
+                                <button 
+                                    className={`pref-btn ${preferences.theme === 'default' ? 'active' : ''}`}
+                                    onClick={() => updatePreferences({ theme: 'default' })}
+                                >
+                                    <span className="theme-dot default"></span> Default
+                                </button>
+                                <button 
+                                    className={`pref-btn ${preferences.theme === 'midnight' ? 'active' : ''}`}
+                                    onClick={() => updatePreferences({ theme: 'midnight' })}
+                                >
+                                    <span className="theme-dot midnight"></span> Midnight
+                                </button>
+                                <button 
+                                    className={`pref-btn ${preferences.theme === 'ocean' ? 'active' : ''}`}
+                                    onClick={() => updatePreferences({ theme: 'ocean' })}
+                                >
+                                    <span className="theme-dot ocean"></span> Ocean
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="pref-group">
+                            <label className="pref-label"><Type size={16} /> Typography</label>
+                            <div className="pref-options">
+                                <button 
+                                    className={`pref-btn font-inter ${preferences.font === 'inter' ? 'active' : ''}`}
+                                    onClick={() => updatePreferences({ font: 'inter' })}
+                                >Inter</button>
+                                <button 
+                                    className={`pref-btn font-outfit ${preferences.font === 'outfit' ? 'active' : ''}`}
+                                    onClick={() => updatePreferences({ font: 'outfit' })}
+                                >Outfit</button>
+                                <button 
+                                    className={`pref-btn font-playfair ${preferences.font === 'playfair' ? 'active' : ''}`}
+                                    onClick={() => updatePreferences({ font: 'playfair' })}
+                                >Playfair</button>
+                                <button 
+                                    className={`pref-btn font-fira ${preferences.font === 'fira' ? 'active' : ''}`}
+                                    onClick={() => updatePreferences({ font: 'fira' })}
+                                >Fira Code</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Export Card */}
                 <div className="settings-card">
                     <div className="settings-card-icon export">

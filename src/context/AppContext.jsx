@@ -11,6 +11,21 @@ export function AppProvider({ children }) {
     const [accounts, setAccounts] = useState([]);
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
+    const defaultPrefs = { theme: 'default', font: 'inter' };
+    const savedPrefs = localStorage.getItem('preferences');
+    const [preferences, setPreferences] = useState(savedPrefs ? JSON.parse(savedPrefs) : defaultPrefs);
+
+    // Apply global CSS attributes based on preferences
+    useEffect(() => {
+        localStorage.setItem('preferences', JSON.stringify(preferences));
+        document.documentElement.setAttribute('data-theme', preferences.theme);
+        document.documentElement.setAttribute('data-font', preferences.font);
+    }, [preferences]);
+
+    const updatePreferences = (updates) => {
+        setPreferences(prev => ({ ...prev, ...updates }));
+    };
+
     // Check auth on mount
     useEffect(() => {
         const checkAuth = async () => {
@@ -99,6 +114,8 @@ export function AppProvider({ children }) {
             accounts,
             sidebarOpen,
             setSidebarOpen,
+            preferences,
+            updatePreferences,
             handleLogin,
             handleLogout,
             fetchCategories,
