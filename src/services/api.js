@@ -69,4 +69,15 @@ export const deleteAccount = (id) => api.delete(`/accounts/${id}`);
 export const seedAccounts = () => api.post('/accounts/seed');
 export const ensureAccount = (name) => api.post('/accounts/ensure', { name });
 
+// Splits / Money Owed
+export const getSplits = () => api.get('/splits');
+export const addSplit = (data) => api.post('/splits', data);
+export const updateSplit = (id, data) => api.put(`/splits/${id}`, data);
+export const deleteSplit = (id) => api.delete(`/splits/${id}`);
+
+// Friends
+export const getFriends = () => api.get('/friends');
+export const addFriend = (data) => api.post('/friends', data);
+export const deleteFriend = (id) => api.delete(`/friends/${id}`);
+
 export default api;

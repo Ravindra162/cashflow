@@ -12,6 +12,16 @@ const transactionSchema = new mongoose.Schema({
         required: [true, 'Amount is required'],
         min: 0
     },
+    originalAmount: {
+        type: Number,
+        default: null,
+        min: 0
+    },
+    pendingSplitAmount: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
     type: {
         type: String,
         required: true,

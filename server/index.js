@@ -9,6 +9,8 @@ import categoryRoutes from './routes/categories.js';
 import statsRoutes from './routes/stats.js';
 import spendHistoryRoutes from './routes/spendHistory.js';
 import accountRoutes from './routes/accounts.js';
+import splitRoutes from './routes/splits.js';
+import friendRoutes from './routes/friends.js';
 import auth from './middleware/auth.js';
 
 dotenv.config();
@@ -46,6 +48,8 @@ app.use('/api/categories', auth, categoryRoutes);
 app.use('/api/stats', auth, statsRoutes);
 app.use('/api/spend-history', auth, spendHistoryRoutes);
 app.use('/api/accounts', auth, accountRoutes);
+app.use('/api/splits', auth, splitRoutes);
+app.use('/api/friends', auth, friendRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

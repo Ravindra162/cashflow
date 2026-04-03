@@ -7,6 +7,7 @@ import {
     deleteTransaction
 } from '../services/api';
 import TransactionModal from '../components/TransactionModal';
+import SplitTransactionModal from '../components/SplitTransactionModal';
 import {
     Plus,
     Search,
@@ -17,7 +18,8 @@ import {
     ArrowDownRight,
     Calendar,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    SplitSquareHorizontal
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -38,6 +40,10 @@ export default function Transactions() {
     const [showFilters, setShowFilters] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
     const [filterAccount, setFilterAccount] = useState('');
+    
+    // Split States
+    const [showSplitModal, setShowSplitModal] = useState(false);
+    const [splitTx, setSplitTx] = useState(null);
 
     const fetchTransactions = useCallback(async () => {
         setLoading(true);
@@ -209,9 +215,19 @@ export default function Transactions() {
                                 <div className={`tx-amount ${tx.type}`}>
                                     {tx.type === 'income' ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
                                     {formatCurrency(tx.amount)}
+                                    {tx.originalAmount && tx.originalAmount > tx.amount && (
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }} title="Decreased due to Settled Splits">
+                                            Prev: {formatCurrency(tx.originalAmount)}
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="tx-actions">
-                                    <button className="icon-btn" onClick={() => { setEditTx(tx); setShowModal(true); }}>
+                                    {(tx.amount - (tx.pendingSplitAmount || 0)) > 0 && (
+                                        <button className="icon-btn" onClick={() => { setSplitTx(tx); setShowSplitModal(true); }} title="Split Transaction">
+                                            <SplitSquareHorizontal size={16} />
+                                        </button>
+                                    )}
+                                    <button className="icon-btn" onClick={() => { setEditTx(tx); setShowModal(true); }} title="Edit">
                                         <Edit3 size={16} />
                                     </button>
                                     <button
@@ -265,6 +281,14 @@ export default function Transactions() {
                     transaction={editTx}
                     onClose={() => { setShowModal(false); setEditTx(null); }}
                     onSave={handleSave}
+                />
+            )}
+
+            {showSplitModal && splitTx && (
+                <SplitTransactionModal
+                    transaction={splitTx}
+                    onClose={() => { setShowSplitModal(false); setSplitTx(null); }}
+                    onSave={fetchTransactions}
                 />
             )}
         </div>

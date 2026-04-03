@@ -2041,57 +2041,14 @@ a {
 
 @media (max-width: 768px) {
 
-  /* === Hide desktop sidebar, show bottom nav === */
-  .sidebar,
-  .sidebar-toggle,
-  .sidebar-overlay {
-    display: none !important;
-  }
-
-  .bottom-nav {
+  .sidebar-toggle {
     display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
-    background: var(--bg-secondary);
-    border-top: 1px solid var(--border-color);
-    z-index: 200;
-    align-items: center;
-    justify-content: space-around;
-    padding: 0 4px;
-    padding-bottom: env(safe-area-inset-bottom, 0);
-    backdrop-filter: blur(20px);
-  }
-
-  .bottom-nav-item {
-    display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    padding: 6px 0;
-    color: var(--text-muted);
-    font-size: 0.65rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: var(--transition);
-    flex: 1;
-    min-width: 0;
-    border-radius: var(--radius-sm);
   }
-
-  .bottom-nav-item svg {
-    flex-shrink: 0;
-  }
-
-  .bottom-nav-item.active {
-    color: var(--primary-light);
-  }
-
-  .bottom-nav-item.active svg {
-    filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.4));
+  
+  .sidebar {
+    width: 260px; /* Slightly narrower on mobile */
   }
 
   /* === Layout adjustments === */
@@ -2102,9 +2059,8 @@ a {
 
   .main-content {
     padding: 16px 14px;
-    padding-top: 16px;
-    padding-bottom: 80px;
-    /* Space for bottom nav */
+    padding-top: 72px;
+    padding-bottom: 24px;
   }
 
   /* === Page Headers === */
@@ -2558,7 +2514,8 @@ a {
 @media (max-width: 480px) {
   .main-content {
     padding: 12px 10px;
-    padding-bottom: 76px;
+    padding-top: 72px;
+    padding-bottom: 24px;
   }
 
   .page-header h1 {
@@ -2608,18 +2565,7 @@ a {
     font-size: 0.75rem;
   }
 
-  .bottom-nav {
-    height: 56px;
-  }
 
-  .bottom-nav-item {
-    font-size: 0.6rem;
-  }
-
-  .bottom-nav-item svg {
-    width: 18px;
-    height: 18px;
-  }
 
   .chart-card {
     padding: 12px;

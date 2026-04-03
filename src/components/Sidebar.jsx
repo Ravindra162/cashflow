@@ -10,7 +10,8 @@ import {
     LogOut,
     Wallet,
     Menu,
-    X
+    X,
+    Users
 } from 'lucide-react';
 
 const navItems = [
@@ -19,17 +20,11 @@ const navItems = [
     { to: '/accounts', label: 'Accounts', icon: CreditCard },
     { to: '/categories', label: 'Categories', icon: Tags },
     { to: '/spend-history', label: 'History', icon: History },
+    { to: '/splits', label: 'Money Owed', icon: Users },
     { to: '/settings', label: 'Settings', icon: Settings },
 ];
 
-// Bottom nav only shows these 5 (most used)
-const bottomNavItems = [
-    { to: '/', label: 'Home', icon: LayoutDashboard },
-    { to: '/transactions', label: 'Txns', icon: ArrowLeftRight },
-    { to: '/accounts', label: 'Accounts', icon: CreditCard },
-    { to: '/spend-history', label: 'History', icon: History },
-    { to: '/settings', label: 'More', icon: Menu },
-];
+
 
 export default function Sidebar() {
     const { handleLogout, sidebarOpen, setSidebarOpen } = useApp();
@@ -92,22 +87,7 @@ export default function Sidebar() {
                 />
             )}
 
-            {/* Mobile bottom nav */}
-            <nav className="bottom-nav">
-                {bottomNavItems.map(({ to, label, icon: Icon }) => (
-                    <NavLink
-                        key={to}
-                        to={to}
-                        end={to === '/'}
-                        className={({ isActive }) =>
-                            `bottom-nav-item ${isActive ? 'active' : ''}`
-                        }
-                    >
-                        <Icon size={20} />
-                        <span>{label}</span>
-                    </NavLink>
-                ))}
-            </nav>
+
         </>
     );
 }

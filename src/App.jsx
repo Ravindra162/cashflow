@@ -8,6 +8,7 @@ import Accounts from './pages/Accounts';
 import Categories from './pages/Categories';
 import SpendHistory from './pages/SpendHistory';
 import Settings from './pages/Settings';
+import Splits from './pages/Splits';
 import './index.css';
 
 function ProtectedRoute({ children }) {
@@ -37,6 +38,7 @@ function AppLayout() {
           <Route path="/accounts" element={<Accounts />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/spend-history" element={<SpendHistory />} />
+          <Route path="/splits" element={<Splits />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </main>

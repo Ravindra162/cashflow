@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { verifyToken, getCategories, seedCategories, getAccounts, seedAccounts } from '../services/api';
+import { verifyToken, getCategories, seedCategories, getAccounts, seedAccounts, getFriends } from '../services/api';
 
 const AppContext = createContext(null);
 
@@ -9,6 +9,7 @@ export function AppProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const [categories, setCategories] = useState([]);
     const [accounts, setAccounts] = useState([]);
+    const [friends, setFriends] = useState([]);
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
     const defaultPrefs = { theme: 'default', font: 'inter' };
@@ -66,12 +67,23 @@ export function AppProvider({ children }) {
         }
     }, []);
 
+    // Fetch friends once authenticated
+    const fetchFriends = useCallback(async () => {
+        try {
+            const res = await getFriends();
+            setFriends(res.data);
+        } catch (err) {
+            console.error('Failed to load friends:', err);
+        }
+    }, []);
+
     useEffect(() => {
         if (isAuthenticated) {
             fetchCategories();
             fetchAccounts();
+            fetchFriends();
         }
-    }, [isAuthenticated, fetchCategories, fetchAccounts]);
+    }, [isAuthenticated, fetchCategories, fetchAccounts, fetchFriends]);
 
     const handleLogin = (newToken) => {
         localStorage.setItem('token', newToken);
@@ -112,6 +124,7 @@ export function AppProvider({ children }) {
             token,
             categories,
             accounts,
+            friends,
             sidebarOpen,
             setSidebarOpen,
             preferences,
@@ -120,6 +133,7 @@ export function AppProvider({ children }) {
             handleLogout,
             fetchCategories,
             fetchAccounts,
+            fetchFriends,
             getCategoryColor,
             getCategoryIcon,
             getAccountColor,
