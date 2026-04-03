@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@400;600;700&family=Fira+Code&display=swap');
 
 /* ===== CSS Variables & Design Tokens (Claymorphism) ===== */
 :root {
@@ -144,8 +144,20 @@ body {
   font-family: var(--font-family);
   background: var(--bg-primary);
   color: var(--text-primary);
+  line-height: 1.5;
+  transition: var(--transition);
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+/* ===== Rich Generated Icons ===== */
+svg.lucide {
+  stroke-width: 2.25;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.12));
+}
+[data-theme="midnight"] svg.lucide,
+[data-theme="ocean"] svg.lucide {
+  filter: drop-shadow(0 2px 6px rgba(59, 130, 246, 0.2));
 }
 
 input,
@@ -2120,6 +2132,10 @@ a {
   }
 
   /* === Page Headers === */
+  .sidebar-header {
+    padding-left: 64px; /* Fix overlapping logo */
+  }
+
   .page-header {
     flex-direction: column;
     align-items: flex-start;

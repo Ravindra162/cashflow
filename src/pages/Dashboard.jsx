@@ -11,11 +11,10 @@ import {
     X,
     Filter
 } from 'lucide-react';
-import {
-    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-    PieChart, Pie, Cell
-} from 'recharts';
+import ReactApexChart from 'react-apexcharts';
+import { motion } from 'framer-motion';
 import { format } from 'date-fns';
+import { PageTransition, AnimatedCard, AnimatedList, AnimatedListItem, TactileButton } from '../components/ui/MotionComponents';
 
 export default function Dashboard() {
     const { getCategoryColor, getCategoryIcon, accounts, getAccountIcon, getAccountColor } = useApp();
@@ -113,8 +112,37 @@ export default function Dashboard() {
         );
     }
 
+    const trendSeries = [
+        { name: 'Income', data: monthlyData.map(d => d.income) },
+        { name: 'Expenses', data: monthlyData.map(d => d.expense) }
+    ];
+    const trendOptions = {
+        chart: { type: 'area', fontFamily: 'inherit', toolbar: { show: false }, background: 'transparent', dropShadow: { enabled: true, top: 4, left: 0, blur: 4, opacity: 0.15 } },
+        colors: ['#00D68F', '#FF6B6B'],
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 3 },
+        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05, stops: [0, 90, 100] } },
+        xaxis: { categories: monthlyData.map(d => d.monthName), labels: { style: { colors: '#94a3b8' } }, axisBorder: { show: false }, axisTicks: { show: false } },
+        yaxis: { labels: { style: { colors: '#94a3b8' }, formatter: (v) => `₹${v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v}` } },
+        grid: { borderColor: 'rgba(255,255,255,0.06)', strokeDashArray: 4 },
+        tooltip: { theme: 'dark' },
+        legend: { show: false }
+    };
+
+    const pieSeries = categoryData.map(d => d.total);
+    const pieOptions = {
+        chart: { type: 'donut', fontFamily: 'inherit', background: 'transparent' },
+        labels: categoryData.map(d => d._id),
+        colors: categoryData.map((d, i) => getCategoryColor(d._id) || CHART_COLORS[i % CHART_COLORS.length]),
+        stroke: { width: 0 },
+        dataLabels: { enabled: false },
+        tooltip: { theme: 'dark' },
+        legend: { show: false },
+        plotOptions: { pie: { donut: { size: '75%' } } }
+    };
+
     return (
-        <div className="dashboard">
+        <PageTransition className="dashboard">
             <div className="page-header">
                 <div>
                     <h1>Dashboard</h1>
@@ -143,8 +171,18 @@ export default function Dashboard() {
                                 key={p}
                                 className={`period-btn ${period === p ? 'active' : ''}`}
                                 onClick={() => setPeriod(p)}
+                                style={{ position: 'relative', background: 'transparent', zIndex: 1, border: 'none', cursor: 'pointer', padding: '6px 10px', boxShadow: 'none' }}
                             >
-                                {p === 'all' ? 'All Time' : p.charAt(0).toUpperCase() + p.slice(1)}
+                                {period === p && (
+                                    <motion.div
+                                        layoutId="activePeriod"
+                                        style={{ position: 'absolute', inset: 0, background: 'var(--primary)', borderRadius: 'var(--radius-sm)', zIndex: -1 }}
+                                        transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+                                    />
+                                )}
+                                <span style={{ position: 'relative', zIndex: 1, color: period === p ? 'white' : 'inherit' }}>
+                                    {p === 'all' ? 'All Time' : p.charAt(0).toUpperCase() + p.slice(1)}
+                                </span>
                             </button>
                         ))}
                     </div>
@@ -179,7 +217,7 @@ export default function Dashboard() {
 
             {/* Summary Cards */}
             <div className="summary-cards">
-                <div className="summary-card balance-card">
+                <AnimatedCard delay={0.05} className="summary-card balance-card">
                     <div className="card-icon">
                         <Wallet size={24} />
                     </div>
@@ -187,8 +225,8 @@ export default function Dashboard() {
                         <span className="card-label">Balance</span>
                         <span className="card-value">{formatCurrency(summary.balance)}</span>
                     </div>
-                </div>
-                <div className="summary-card income-card">
+                </AnimatedCard>
+                <AnimatedCard delay={0.1} className="summary-card income-card">
                     <div className="card-icon income">
                         <TrendingUp size={24} />
                     </div>
@@ -196,8 +234,8 @@ export default function Dashboard() {
                         <span className="card-label">Income</span>
                         <span className="card-value income">{formatCurrency(summary.income)}</span>
                     </div>
-                </div>
-                <div className="summary-card expense-card">
+                </AnimatedCard>
+                <AnimatedCard delay={0.15} className="summary-card expense-card">
                     <div className="card-icon expense">
                         <TrendingDown size={24} />
                     </div>
@@ -205,7 +243,7 @@ export default function Dashboard() {
                         <span className="card-label">Expenses</span>
                         <span className="card-value expense">{formatCurrency(summary.expense)}</span>
                     </div>
-                </div>
+                </AnimatedCard>
             </div>
 
             {/* Account-wise Balances */}
@@ -242,70 +280,21 @@ export default function Dashboard() {
             {/* Charts Row */}
             <div className="charts-row">
                 {/* Monthly Trend */}
-                <div className="chart-card trend-chart">
+                <AnimatedCard delay={0.2} className="chart-card trend-chart">
                     <h3>Monthly Trend</h3>
-                    <ResponsiveContainer width="100%" height={280}>
-                        <AreaChart data={monthlyData}>
-                            <defs>
-                                <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#00D68F" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#00D68F" stopOpacity={0} />
-                                </linearGradient>
-                                <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#FF6B6B" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#FF6B6B" stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                            <XAxis dataKey="monthName" stroke="#94A3B8" fontSize={12} />
-                            <YAxis stroke="#94A3B8" fontSize={12} tickFormatter={(v) => `₹${v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v}`} />
-                            <Tooltip
-                                contentStyle={{
-                                    background: 'rgba(15, 15, 35, 0.95)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '12px',
-                                    color: '#E2E8F0'
-                                }}
-                                formatter={(value) => formatCurrency(value)}
-                            />
-                            <Area type="monotone" dataKey="income" stroke="#00D68F" fill="url(#incomeGrad)" strokeWidth={2} />
-                            <Area type="monotone" dataKey="expense" stroke="#FF6B6B" fill="url(#expenseGrad)" strokeWidth={2} />
-                        </AreaChart>
-                    </ResponsiveContainer>
-                </div>
+                    <div style={{ height: 280, width: '100%' }}>
+                        <ReactApexChart options={trendOptions} series={trendSeries} type="area" height="100%" />
+                    </div>
+                </AnimatedCard>
 
                 {/* Category Breakdown */}
-                <div className="chart-card category-chart">
+                <AnimatedCard delay={0.3} className="chart-card category-chart">
                     <h3>Spending by Category</h3>
                     {categoryData.length > 0 ? (
                         <>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <PieChart>
-                                    <Pie
-                                        data={categoryData}
-                                        dataKey="total"
-                                        nameKey="_id"
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={55}
-                                        outerRadius={85}
-                                        paddingAngle={3}
-                                    >
-                                        {categoryData.map((entry, i) => (
-                                            <Cell key={i} fill={getCategoryColor(entry._id) || CHART_COLORS[i % CHART_COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip
-                                        contentStyle={{
-                                            background: 'rgba(15, 15, 35, 0.95)',
-                                            border: '1px solid rgba(255,255,255,0.1)',
-                                            borderRadius: '12px',
-                                            color: '#E2E8F0'
-                                        }}
-                                        formatter={(value) => formatCurrency(value)}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
+                            <div style={{ height: 220, width: '100%', display: 'flex', justifyContent: 'center' }}>
+                                <ReactApexChart options={pieOptions} series={pieSeries} type="donut" height="100%" />
+                            </div>
                             <div className="category-legend">
                                 {categoryData.slice(0, 5).map((cat, i) => (
                                     <div key={i} className="legend-item">
@@ -324,18 +313,18 @@ export default function Dashboard() {
                             <p>No expenses yet</p>
                         </div>
                     )}
-                </div>
+                </AnimatedCard>
             </div>
 
             {/* Recent Transactions */}
-            <div className="chart-card recent-transactions">
+            <AnimatedCard delay={0.4} className="chart-card recent-transactions">
                 <div className="section-header">
                     <h3>Recent Transactions</h3>
                 </div>
                 {recentTransactions.length > 0 ? (
-                    <div className="transaction-list compact">
+                    <AnimatedList className="transaction-list compact">
                         {recentTransactions.map(tx => (
-                            <div key={tx._id} className="transaction-item">
+                            <AnimatedListItem key={tx._id} className="transaction-item">
                                 <div className="tx-icon" style={{ background: getCategoryColor(tx.category) + '22', color: getCategoryColor(tx.category) }}>
                                     {getCategoryIcon(tx.category)}
                                 </div>
@@ -351,15 +340,15 @@ export default function Dashboard() {
                                     {tx.type === 'income' ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
                                     {formatCurrency(tx.amount)}
                                 </div>
-                            </div>
+                            </AnimatedListItem>
                         ))}
-                    </div>
+                    </AnimatedList>
                 ) : (
                     <div className="empty-state-small">
                         <p>No transactions yet. Add your first one!</p>
                     </div>
                 )}
-            </div>
-        </div>
+            </AnimatedCard>
+        </PageTransition>
     );
 }

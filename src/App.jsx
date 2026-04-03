@@ -25,22 +25,28 @@ function ProtectedRoute({ children }) {
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
+import { useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+
 function AppLayout() {
   const { sidebarOpen } = useApp();
+  const location = useLocation();
 
   return (
     <div className={`app-layout ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
       <Sidebar />
       <main className="main-content">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/accounts" element={<Accounts />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/spend-history" element={<SpendHistory />} />
-          <Route path="/splits" element={<Splits />} />
-          <Route path="/settings" element={<Settings />} />
-        </Routes>
+        <AnimatePresence mode="wait" initial={false}>
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/accounts" element={<Accounts />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/spend-history" element={<SpendHistory />} />
+            <Route path="/splits" element={<Splits />} />
+            <Route path="/settings" element={<Settings />} />
+          </Routes>
+        </AnimatePresence>
       </main>
     </div>
   );
