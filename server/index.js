@@ -11,6 +11,8 @@ import spendHistoryRoutes from './routes/spendHistory.js';
 import accountRoutes from './routes/accounts.js';
 import splitRoutes from './routes/splits.js';
 import friendRoutes from './routes/friends.js';
+import budgetRoutes from './routes/budgets.js';
+import insightRoutes from './routes/insights.js';
 import auth from './middleware/auth.js';
 
 dotenv.config();
@@ -50,6 +52,8 @@ app.use('/api/spend-history', auth, spendHistoryRoutes);
 app.use('/api/accounts', auth, accountRoutes);
 app.use('/api/splits', auth, splitRoutes);
 app.use('/api/friends', auth, friendRoutes);
+app.use('/api/budgets', auth, budgetRoutes);
+app.use('/api/insights', auth, insightRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

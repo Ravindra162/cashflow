@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { getSummary, getByCategory, getMonthlyTrend, getTransactions, getByAccount } from '../services/api';
+import { getSummary, getByCategory, getMonthlyTrend, getTransactions, getByAccount, getBudgetStatus, getInsights } from '../services/api';
 import {
     TrendingUp,
     TrendingDown,
@@ -9,7 +9,14 @@ import {
     ArrowDownRight,
     Calendar,
     X,
-    Filter
+    Filter,
+    Target,
+    Sparkles,
+    AlertTriangle,
+    CheckCircle2,
+    Lightbulb,
+    Info,
+    Loader2
 } from 'lucide-react';
 import ReactApexChart from 'react-apexcharts';
 import { motion } from 'framer-motion';
@@ -26,6 +33,10 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState('all');
     const [selectedAccount, setSelectedAccount] = useState('');
+    const [budgetStatus, setBudgetStatus] = useState([]);
+    const [insights, setInsights] = useState(null);
+    const [insightsLoading, setInsightsLoading] = useState(false);
+    const [insightsError, setInsightsError] = useState(null);
 
     const hasFilters = period !== 'all' || selectedAccount !== '';
 
@@ -36,7 +47,33 @@ export default function Dashboard() {
     // Fetch account balances independently (always all-time)
     useEffect(() => {
         fetchAccountBalances();
+        // Fetch budgets + insights once on mount
+        fetchBudgetAndInsights();
     }, []);
+
+    const fetchBudgetAndInsights = async () => {
+        try {
+            const [budgetRes] = await Promise.all([getBudgetStatus()]);
+            setBudgetStatus(budgetRes.data);
+        } catch (err) {
+            console.error('Budget fetch error:', err);
+        }
+    };
+
+    const fetchInsights = async () => {
+        setInsightsLoading(true);
+        setInsightsError(null);
+        try {
+            const insightRes = await getInsights();
+            setInsights(insightRes.data);
+        } catch (err) {
+            console.error('Insights fetch error:', err);
+            setInsights(null);
+            setInsightsError(err.response?.data?.error || 'Failed to generate insights. Tap to retry.');
+        } finally {
+            setInsightsLoading(false);
+        }
+    };
 
     const getDateRange = () => {
         const now = new Date();
@@ -346,6 +383,101 @@ export default function Dashboard() {
                 ) : (
                     <div className="empty-state-small">
                         <p>No transactions yet. Add your first one!</p>
+                    </div>
+                )}
+            </AnimatedCard>
+
+            {/* Budget Overview */}
+            {budgetStatus.length > 0 && (
+                <AnimatedCard delay={0.45} className="chart-card budget-overview-card">
+                    <div className="section-header">
+                        <h3><Target size={18} /> Budget Overview</h3>
+                    </div>
+                    <div className="budget-overview-list">
+                        {budgetStatus.slice(0, 4).map((b, i) => {
+                            const color = b.percentage >= 100 ? '#ef4444' : b.percentage >= 80 ? '#f97316' : b.percentage >= 60 ? '#eab308' : '#10b981';
+                            return (
+                                <motion.div
+                                    key={b._id}
+                                    className={`budget-overview-item budget-${b.status}`}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.5 + i * 0.08 }}
+                                >
+                                    <div className="budget-ov-header">
+                                        <span className="budget-ov-category">{b.category === '__ALL__' ? '📊 Total' : b.category}</span>
+                                        <span className="budget-ov-amounts" style={{ color }}>
+                                            {formatCurrency(b.spent)} / {formatCurrency(b.limit)}
+                                        </span>
+                                    </div>
+                                    <div className="budget-progress-track mini">
+                                        <motion.div
+                                            className="budget-progress-fill"
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${Math.min(b.percentage, 100)}%` }}
+                                            transition={{ duration: 0.8, delay: 0.6 + i * 0.1 }}
+                                            style={{ background: `linear-gradient(90deg, ${color}88, ${color})`, boxShadow: `0 0 8px ${color}33` }}
+                                        />
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
+                    </div>
+                </AnimatedCard>
+            )}
+
+            {/* AI Insights */}
+            <AnimatedCard delay={0.5} className="chart-card insights-card">
+                <div className="section-header">
+                    <h3><Sparkles size={18} /> AI Insights</h3>
+                </div>
+                {insightsLoading ? (
+                    <div className="insights-loading">
+                        <div className="insights-shimmer" />
+                        <div className="insights-shimmer short" />
+                        <div className="insights-shimmer" />
+                        <p className="insights-loading-text"><Loader2 size={16} className="spin" /> Analyzing your spending patterns...</p>
+                    </div>
+                ) : insights && insights.insights ? (
+                    <div className="insights-list">
+                        {insights.insights.map((insight, i) => (
+                            <motion.div
+                                key={i}
+                                className={`insight-item insight-${insight.type}`}
+                                initial={{ opacity: 0, y: 15 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 * i, type: 'spring', stiffness: 300, damping: 25 }}
+                            >
+                                <div className="insight-icon">
+                                    {insight.type === 'warning' && <AlertTriangle size={18} />}
+                                    {insight.type === 'tip' && <Lightbulb size={18} />}
+                                    {insight.type === 'positive' && <CheckCircle2 size={18} />}
+                                    {insight.type === 'info' && <Info size={18} />}
+                                </div>
+                                <div className="insight-content">
+                                    <strong>{insight.title}</strong>
+                                    <p>{insight.body}</p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                ) : insightsError ? (
+                    <div className="insights-error">
+                        <AlertTriangle size={24} />
+                        <p>AI quota limit reached. Please wait a minute and try again.</p>
+                        <TactileButton className="btn btn-primary" onClick={fetchInsights}>
+                            <Sparkles size={16} /> Retry
+                        </TactileButton>
+                    </div>
+                ) : (
+                    <div className="empty-state-small" style={{ gap: '12px' }}>
+                        <div className="insight-icon" style={{ background: 'var(--primary-light)', color: '#fff', width: 48, height: 48, marginBottom: 8 }}>
+                            <Sparkles size={24} />
+                        </div>
+                        <p>Get personalized financial advice based on your spending patterns this month.</p>
+                        <TactileButton className="btn btn-primary" onClick={fetchInsights}>
+                            <Sparkles size={16} /> Generate AI Insights
+                        </TactileButton>
                     </div>
                 )}
             </AnimatedCard>

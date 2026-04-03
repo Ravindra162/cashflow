@@ -80,4 +80,14 @@ export const getFriends = () => api.get('/friends');
 export const addFriend = (data) => api.post('/friends', data);
 export const deleteFriend = (id) => api.delete(`/friends/${id}`);
 
+// Budgets
+export const getBudgets = () => api.get('/budgets');
+export const getBudgetStatus = () => api.get('/budgets/status');
+export const addBudget = (data) => api.post('/budgets', data);
+export const updateBudget = (id, data) => api.put(`/budgets/${id}`, data);
+export const deleteBudget = (id) => api.delete(`/budgets/${id}`);
+
+// AI Insights
+export const getInsights = () => api.post('/insights/generate');
+
 export default api;

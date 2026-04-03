@@ -11,7 +11,8 @@ import {
     Wallet,
     Menu,
     X,
-    Users
+    Users,
+    Target
 } from 'lucide-react';
 
 const navItems = [
@@ -19,6 +20,7 @@ const navItems = [
     { to: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
     { to: '/accounts', label: 'Accounts', icon: CreditCard },
     { to: '/categories', label: 'Categories', icon: Tags },
+    { to: '/budgets', label: 'Budgets', icon: Target },
     { to: '/spend-history', label: 'History', icon: History },
     { to: '/splits', label: 'Money Owed', icon: Users },
     { to: '/settings', label: 'Settings', icon: Settings },
