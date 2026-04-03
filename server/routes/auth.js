@@ -8,6 +8,9 @@ const router = Router();
 let hashedPassword = null;
 
 async function getHashedPassword() {
+    if (!process.env.APP_PASSWORD) {
+        throw new Error('APP_PASSWORD environment variable is missing! Please configure it in Vercel settings.');
+    }
     if (!hashedPassword) {
         hashedPassword = await bcrypt.hash(process.env.APP_PASSWORD, 10);
     }
@@ -37,7 +40,7 @@ router.post('/login', async (req, res) => {
 
         res.json({ token, message: 'Login successful' });
     } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: error.message || 'Server error' });
     }
 });
 
