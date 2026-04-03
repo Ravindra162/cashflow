@@ -25,3 +25,4 @@ start-dev.sh
 *.njsproj
 *.sln
 *.sw?
+.stitch
