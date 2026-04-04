@@ -6,9 +6,9 @@ const router = Router();
 
 router.post('/generate', async (req, res) => {
     try {
-        const apiKey = process.env.OPENROUTER_API_KEY;
+        const apiKey = process.env.NVIDIA_API_KEY;
         if (!apiKey) {
-            return res.status(500).json({ error: 'OpenRouter API key not configured. Add OPENROUTER_API_KEY to your .env' });
+            return res.status(500).json({ error: 'NVIDIA API key not configured. Add NVIDIA_API_KEY to your .env' });
         }
 
         // Gather data: current month
@@ -96,10 +96,9 @@ Rules:
 - If there's no data, provide general financial tips`;
 
         const modelsToTry = [
-            'minimax/minimax-m2.5:free', // Requested by user (may fail due to privacy)
-            'meta-llama/llama-3.3-70b-instruct:free', // Extremely powerful and usually reliable
-            'google/gemma-3-27b-it:free',
-            'nousresearch/hermes-3-llama-3.1-405b:free'
+            'meta/llama-3.1-405b-instruct',
+            'meta/llama-3.1-70b-instruct',
+            'nvidia/llama-3.1-nemotron-70b-instruct'
         ];
 
         let responseText;
@@ -107,13 +106,12 @@ Rules:
 
         for (const modelId of modelsToTry) {
             try {
-                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${apiKey}`,
                         'Content-Type': 'application/json',
-                        'HTTP-Referer': 'https://cashflow-app.vercel.app',
-                        'X-Title': 'CashFlow Expense Tracker'
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({
                         model: modelId,
@@ -128,7 +126,7 @@ Rules:
 
                 if (!response.ok) {
                     const errorBody = await response.text();
-                    throw new Error(`OpenRouter API error (${response.status}) for ${modelId}: ${errorBody}`);
+                    throw new Error(`NVIDIA API error (${response.status}) for ${modelId}: ${errorBody}`);
                 }
 
                 const data = await response.json();
