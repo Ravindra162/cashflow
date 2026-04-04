@@ -22,7 +22,7 @@ import {
     Eye
 } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
-import ReactApexChart from 'react-apexcharts';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip as RechartsTooltip } from 'recharts';
 
 export default function SpendHistory() {
     const { getCategoryColor, getCategoryIcon } = useApp();
@@ -121,16 +121,19 @@ export default function SpendHistory() {
 
     // ===== DETAIL VIEW =====
     if (viewItem && viewData) {
-        const pieSeries = viewData.categoryBreakdown.map(d => d.total);
-        const pieOptions = {
-            chart: { type: 'donut', fontFamily: 'inherit', background: 'transparent' },
-            labels: viewData.categoryBreakdown.map(d => d._id),
-            colors: viewData.categoryBreakdown.map((d, i) => getCategoryColor(d._id) || CHART_COLORS[i % CHART_COLORS.length]),
-            stroke: { width: 0 },
-            dataLabels: { enabled: false },
-            tooltip: { theme: 'dark' },
-            legend: { show: false },
-            plotOptions: { pie: { donut: { size: '75%' } } }
+        const CustomPieTooltip = ({ active, payload }) => {
+            if (active && payload && payload.length) {
+                return (
+                    <div className="custom-tooltip glass-tooltip">
+                        <div className="tooltip-row">
+                            <span className="tooltip-dot" style={{ background: payload[0].payload.fill }}></span>
+                            <span className="tooltip-name">{payload[0].name}</span>
+                            <span className="tooltip-value">{formatCurrency(payload[0].value)}</span>
+                        </div>
+                    </div>
+                );
+            }
+            return null;
         };
 
         return (
@@ -182,8 +185,27 @@ export default function SpendHistory() {
                     {viewData.categoryBreakdown.length > 0 && (
                         <div className="chart-card">
                             <h3>Category Breakdown</h3>
-                            <div style={{ height: 220, width: '100%', display: 'flex', justifyContent: 'center' }}>
-                                <ReactApexChart options={pieOptions} series={pieSeries} type="donut" height="100%" />
+                            <div className="pie-wrapper" style={{ height: 220, width: '100%' }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={viewData.categoryBreakdown}
+                                            dataKey="total"
+                                            nameKey="_id"
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={65}
+                                            outerRadius={85}
+                                            paddingAngle={5}
+                                            stroke="none"
+                                        >
+                                            {viewData.categoryBreakdown.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={getCategoryColor(entry._id) || CHART_COLORS[index % CHART_COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip content={<CustomPieTooltip />} />
+                                    </PieChart>
+                                </ResponsiveContainer>
                             </div>
                             <div className="category-legend">
                                 {viewData.categoryBreakdown.map((cat, i) => (

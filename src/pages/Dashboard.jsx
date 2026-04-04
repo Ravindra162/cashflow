@@ -18,7 +18,7 @@ import {
     Info,
     Loader2
 } from 'lucide-react';
-import ReactApexChart from 'react-apexcharts';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, PieChart, Pie, Cell } from 'recharts';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { PageTransition, AnimatedCard, AnimatedList, AnimatedListItem, TactileButton } from '../components/ui/MotionComponents';
@@ -149,33 +149,37 @@ export default function Dashboard() {
         );
     }
 
-    const trendSeries = [
-        { name: 'Income', data: monthlyData.map(d => d.income) },
-        { name: 'Expenses', data: monthlyData.map(d => d.expense) }
-    ];
-    const trendOptions = {
-        chart: { type: 'area', fontFamily: 'inherit', toolbar: { show: false }, background: 'transparent', dropShadow: { enabled: true, top: 4, left: 0, blur: 4, opacity: 0.15 } },
-        colors: ['#00D68F', '#FF6B6B'],
-        dataLabels: { enabled: false },
-        stroke: { curve: 'smooth', width: 3 },
-        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05, stops: [0, 90, 100] } },
-        xaxis: { categories: monthlyData.map(d => d.monthName), labels: { style: { colors: '#94a3b8' } }, axisBorder: { show: false }, axisTicks: { show: false } },
-        yaxis: { labels: { style: { colors: '#94a3b8' }, formatter: (v) => `₹${v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v}` } },
-        grid: { borderColor: 'rgba(255,255,255,0.06)', strokeDashArray: 4 },
-        tooltip: { theme: 'dark' },
-        legend: { show: false }
+    const CustomAreaTooltip = ({ active, payload, label }) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="custom-tooltip glass-tooltip">
+                    <p className="tooltip-label">{label}</p>
+                    {payload.map((entry, index) => (
+                        <div key={index} className="tooltip-row">
+                            <span className="tooltip-dot" style={{ background: entry.color }}></span>
+                            <span className="tooltip-name">{entry.name}</span>
+                            <span className="tooltip-value">{formatCurrency(entry.value)}</span>
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+        return null;
     };
 
-    const pieSeries = categoryData.map(d => d.total);
-    const pieOptions = {
-        chart: { type: 'donut', fontFamily: 'inherit', background: 'transparent' },
-        labels: categoryData.map(d => d._id),
-        colors: categoryData.map((d, i) => getCategoryColor(d._id) || CHART_COLORS[i % CHART_COLORS.length]),
-        stroke: { width: 0 },
-        dataLabels: { enabled: false },
-        tooltip: { theme: 'dark' },
-        legend: { show: false },
-        plotOptions: { pie: { donut: { size: '75%' } } }
+    const CustomPieTooltip = ({ active, payload }) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="custom-tooltip glass-tooltip">
+                    <div className="tooltip-row">
+                        <span className="tooltip-dot" style={{ background: payload[0].payload.fill }}></span>
+                        <span className="tooltip-name">{payload[0].name}</span>
+                        <span className="tooltip-value">{formatCurrency(payload[0].value)}</span>
+                    </div>
+                </div>
+            );
+        }
+        return null;
     };
 
     return (
@@ -318,19 +322,61 @@ export default function Dashboard() {
             <div className="charts-row">
                 {/* Monthly Trend */}
                 <AnimatedCard delay={0.2} className="chart-card trend-chart">
-                    <h3>Monthly Trend</h3>
-                    <div style={{ height: 280, width: '100%' }}>
-                        <ReactApexChart options={trendOptions} series={trendSeries} type="area" height="100%" />
-                    </div>
+                    <h3>Income & Expenses</h3>
+                    {monthlyData.length > 0 ? (
+                        <div style={{ height: '300px', width: '100%', marginTop: '16px' }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={monthlyData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                                    <defs>
+                                        <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#00D68F" stopOpacity={0.6}/>
+                                            <stop offset="95%" stopColor="#00D68F" stopOpacity={0}/>
+                                        </linearGradient>
+                                        <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#FF6B6B" stopOpacity={0.6}/>
+                                            <stop offset="95%" stopColor="#FF6B6B" stopOpacity={0}/>
+                                        </linearGradient>
+                                    </defs>
+                                    <XAxis dataKey="monthName" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12 }} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12 }} tickFormatter={(v) => `₹${v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v}`} />
+                                    <CartesianGrid vertical={false} strokeDasharray="4 4" stroke="var(--border-color)" />
+                                    <RechartsTooltip content={<CustomAreaTooltip />} cursor={{ stroke: 'var(--border-color-hover)', strokeWidth: 2, strokeDasharray: '4 4' }} />
+                                    <Area type="monotone" dataKey="income" name="Income" stroke="#00D68F" strokeWidth={3} fillOpacity={1} fill="url(#colorIncome)" />
+                                    <Area type="monotone" dataKey="expense" name="Expenses" stroke="#FF6B6B" strokeWidth={3} fillOpacity={1} fill="url(#colorExpense)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    ) : (
+                        <div className="empty-chart">No data available</div>
+                    )}
                 </AnimatedCard>
 
                 {/* Category Breakdown */}
                 <AnimatedCard delay={0.3} className="chart-card category-chart">
-                    <h3>Spending by Category</h3>
+                    <h3>Expenses by Category</h3>
                     {categoryData.length > 0 ? (
-                        <>
-                            <div style={{ height: 220, width: '100%', display: 'flex', justifyContent: 'center' }}>
-                                <ReactApexChart options={pieOptions} series={pieSeries} type="donut" height="100%" />
+                        <div className="pie-chart-container">
+                            <div className="pie-wrapper" style={{ height: '220px', width: '100%' }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={categoryData}
+                                            dataKey="total"
+                                            nameKey="_id"
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={65}
+                                            outerRadius={85}
+                                            paddingAngle={5}
+                                            stroke="none"
+                                        >
+                                            {categoryData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={getCategoryColor(entry._id) || CHART_COLORS[index % CHART_COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip content={<CustomPieTooltip />} />
+                                    </PieChart>
+                                </ResponsiveContainer>
                             </div>
                             <div className="category-legend">
                                 {categoryData.slice(0, 5).map((cat, i) => (
@@ -344,7 +390,7 @@ export default function Dashboard() {
                                     </div>
                                 ))}
                             </div>
-                        </>
+                        </div>
                     ) : (
                         <div className="empty-state-small">
                             <p>No expenses yet</p>
